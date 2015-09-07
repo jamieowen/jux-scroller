@@ -32,6 +32,8 @@ var Scroller = function( opts ){
 	this.onOvershootMax = new Signal();
 
 	this.deferredInteractions = [];
+	this.minInteractionMove = 5;
+	this.enableInteractions = true;
 
 	this.axes = [];
 	this.position = [ 0,0,0 ];
@@ -89,6 +91,8 @@ Scroller.prototype.pointerDown = function( x,y,z ){
 
 Scroller.prototype.pointerUp = function( x,y,z ){
 
+	this.triggerInteractions();
+
 	if( !this.down ){
 		return;
 	}
@@ -99,6 +103,7 @@ Scroller.prototype.pointerUp = function( x,y,z ){
 	}
 
 	this.down = false;
+
 
 };
 
@@ -113,7 +118,7 @@ Scroller.prototype.pointerMove = function( x,y,z ) {
 
 	for( var i = 0; i<this.axes.length; i++ ){
 		if( this.axes[i] )
-			this.axes[i].move( this.position[i] - this.previous[i] );
+			this.axes[i].move( this.previous[i] - this.position[i] );
 	}
 
 };
@@ -129,40 +134,45 @@ Scroller.prototype._setPosition = function( x, y, z ){
 	this.position[2] = z || 0;
 };
 
+Scroller.prototype.triggerInteractions = function(){
+
+	// handle deferred interactions.
+	if( this.deferredInteractions.length ){
+
+		var moveAmount = 0;
+		//var speed = 0;
+		var axis;
+
+		for( var i = 0; i<this.axes.length; i++ ){
+			axis = this.axes[i];
+			if( axis ){
+				moveAmount = Math.max( Math.abs( axis.moveAmount ), moveAmount );
+				//speed = Math.max( Math.abs( axis.speed ), speed );
+			}
+		}
+
+		// TODO : still need to decide on this functionality ( when / when not to trigger )
+		// TODO : This could probably be moved to update ( after pointer up )
+		//console.log( 'Trigger : ', this.enableInteractions, moveAmount, this.minInteractionMove );
+		if( this.enableInteractions ){
+			// && speed < 1
+			if( moveAmount < this.minInteractionMove ) {
+				for (i = 0; i < this.deferredInteractions.length; i++) {
+					this.deferredInteractions[i]();
+				}
+			}
+
+		}
+		this.deferredInteractions.splice(0);
+	}
+
+};
 
 Scroller.prototype.update = function( dt ){
 
 	var changed = false;
 	var axis;
 	var i;
-
-	// handle deferred interactions.
-	if( this.deferredInteractions.length ){
-
-		var shouldEnd = true; // check all axis are going to stop interaction.
-		var moveAmount = 0;
-		var speed = 0;
-
-		for( i = 0; i<this.axes.length; i++ ){
-			axis = this.axes[i];
-			if( axis ){
-				shouldEnd = shouldEnd && axis.scrollShouldEnd;
-				moveAmount = Math.max( Math.abs( axis.moveAmount ), moveAmount );
-				speed = Math.max( Math.abs( axis.speed ), speed );
-			}
-		}
-
-		// trigger interactions. ( this could possibly do this after update? )
-		if( shouldEnd ){
-
-			if( moveAmount < 2 && speed < 1 ) {
-				for (i = 0; i < this.deferredInteractions.length; i++) {
-					this.deferredInteractions[i]();
-				}
-			}
-			this.deferredInteractions.splice(0);
-		}
-	}
 
 	// handle update
 	for( i = 0; i<this.axes.length; i++ ){

@@ -70,7 +70,7 @@ window.onload = function(){
 		var changed = scroller.update();
 		//console.log( changed, scroller.position );
 		var pos = scroller.axes[1].position;
-		container.style.top = ( pos ) + 'px';
+		container.style.top = ( -pos ) + 'px';
 		//console.log( 'POS', pos );
 		requestAnimationFrame( update );
 	};
