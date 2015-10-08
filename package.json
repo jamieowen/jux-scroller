@@ -1,13 +1,14 @@
 {
   "name": "jux-scroller",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Scroller class.. wip",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "docs": "jsdoc2md -t .readme.hbs -p list *.js > README.md"
   },
   "author": "Jamie Owen <hello@jamieowen.com> (=)",
+  "repository": "https://github.com/jamieowen/jux-scroller",
   "license": "ISC",
   "dependencies": {
     "signals": "^1.0.0"
