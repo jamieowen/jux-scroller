@@ -51,17 +51,28 @@ window.onload = function(){
 		return div;
 	};
 
+
 	var container = createElement( '0px','0px','400px','400px' );
 	//container.style.overflow = 'hidden';
 	container.style.backgroundColor = null;
 	document.body.appendChild( container );
 	var ele;
 	var max = 0;
-	for( var i = 0; i<8; i++ ){
+	for( var i = 0; i<30; i++ ){
 		ele = createElement( '0px', ( (i * 300) + ( i * 1 ) ) + 'px', '400px', '300px' );
 		container.appendChild( ele );
 		max += 300;
 	}
+
+	scroller.axes[1].constraints[ 'snap' ] = function( axis, pos ){
+
+		return Math.round( pos / 301 ) * 301;
+		/**if( pos > 100 && pos < 200 ){
+			return 150;
+		}else{
+			return NaN;
+		}**/
+	};
 
 	scroller.setViewSize( 0, 400, 0 );
 	scroller.setMax( 0, max, 0 );
