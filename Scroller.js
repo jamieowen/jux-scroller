@@ -8,14 +8,7 @@ var defaultOpts = {
 	pointerBounds: null // supply a rect object { left: 0, top: 0, right: 500, bottom: 500 }
 };
 
-/**
- *
- * Scroller Class for jux.
 
- * @param opts
- * @constructor
- *
- */
 var Scroller = function( opts ){
 
 	opts = opts || {};
@@ -39,7 +32,7 @@ var Scroller = function( opts ){
 	this.position = [ 0,0,0 ];
 	this.previous = [ 0,0,0 ];
 
-	for( var i = 0; i<3; i++ ){
+	for( var i = 0; i<opts.axes.length; i++ ){
 		if( opts.axes[i] ){
 			this.axes[i] = new ScrollerAxis();
 		}else{
