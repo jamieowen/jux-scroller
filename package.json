@@ -14,6 +14,7 @@
     "signals": "^1.0.0"
   },
   "devDependencies": {
-    "beefy": "^2.1.5"
+    "beefy": "^2.1.5",
+    "pixi.js": "^3.0.8"
   }
 }
