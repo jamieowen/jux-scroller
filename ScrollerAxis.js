@@ -19,12 +19,7 @@ var ScrollerAxis = function(){
     this.scrollShouldEnd = false;
     this.scrollStart = 0;
 
-	/**
     this.overshoot = 0.25;
-    this.overshootMethod = defaultOvershootMethod;
-    this.overshotMin = false;
-    this.overshotMax = false;
-    this.overshotNorm = 0;**/
 
     this.moveAmount = 0;
     this.moveLast = 0;
@@ -39,8 +34,7 @@ var ScrollerAxis = function(){
 			return pos > max ? max : NaN;
 		},
 		'snap': function (axis, pos) {
-			//var snap = pos % axis.cellSize;
-			return NaN;//pos > ( this.axis.max - this.axis.viewSize );
+			return NaN;
 		}
 	};
 
@@ -67,9 +61,8 @@ module.exports = ScrollerAxis; // leave as new() for now.
 
 ScrollerAxis.prototype = {
 
-	size: function( viewSize, cellSize ){
+	size: function( viewSize ){
 		this.viewSize = viewSize;
-		this.cellSize = cellSize;
 	},
 
     start: function(){
@@ -130,7 +123,24 @@ ScrollerAxis.prototype = {
 
 			}
 			this.speed = 0;
+
 			pos = this.scrollStart + this.moveAmount;
+
+			var overshot = this.constraints['min'](this,pos);
+			if( !isNaN(overshot) ){
+				//console.log( 'overshot min', overshot, pos, this.scrollStart );
+				var diff = overshot - this.scrollStart;
+				var max = this.viewSize * this.overshoot;
+				var amount = ( this.moveAmount - diff ) / ( this.viewSize * this.overshoot );
+
+				console.log( diff, max );
+				//pos = ( this.scrollStart + diff ) - ( this.moveAmount * amount );
+			}else{
+				overshot = this.constraints['max'](this,pos);
+				if( !isNaN( overshot ) ){
+					console.log( 'overshot max' );
+				}
+			}
 
 			if( this.scrollShouldEnd ){
 				this.scrollShouldEnd = false;
@@ -177,7 +187,7 @@ ScrollerAxis.prototype = {
 			}
 		}else{
 			this.speed *= this.friction;
-			if( Math.abs(this.speed) < 0.01 ){
+			if( Math.abs(this.speed) < 0.001 ){
 				this.speed = 0;
 			}
 			pos += this.speed;
