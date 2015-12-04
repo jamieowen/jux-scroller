@@ -126,21 +126,32 @@ ScrollerAxis.prototype = {
 
 			pos = this.scrollStart + this.moveAmount;
 
-			var overshot = this.constraints['min'](this,pos);
-			if( !isNaN(overshot) ){
-				//console.log( 'overshot min', overshot, pos, this.scrollStart );
-				var diff = overshot - this.scrollStart;
-				var max = this.viewSize * this.overshoot;
-				var amount = ( this.moveAmount - diff ) / ( this.viewSize * this.overshoot );
+			// adjust moveAmount = moveAmount - ( constraint - start )
+			// pos = constraint + ( adjustMoveAmount / viewSize ) * overShootMax;
 
-				console.log( diff, max );
-				//pos = ( this.scrollStart + diff ) - ( this.moveAmount * amount );
+			var overshot = this.constraints['min'](this,pos);
+			var applyOvershoot = false;
+			var moveAdjust;
+
+			if( !isNaN(overshot) ){
+				applyOvershoot = true;
+				moveAdjust = this.moveAmount - ( overshot - this.scrollStart );
+				console.log( 'adjust min', moveAdjust );
 			}else{
 				overshot = this.constraints['max'](this,pos);
-				if( !isNaN( overshot ) ){
-					console.log( 'overshot max' );
+				if( !isNaN(overshot) ){
+					applyOvershoot = true;
+					moveAdjust = this.moveAmount - ( overshot - this.scrollStart );
+					console.log( 'adjust max', moveAdjust );
 				}
 			}
+
+			if( applyOvershoot ){
+				var max = this.overshoot * this.viewSize;
+				pos = overshot + ( moveAdjust / this.viewSize ) * max;
+				//console.log( 'apply overshoot', this.overshoot, this.viewSize, max, pos );
+			}
+
 
 			if( this.scrollShouldEnd ){
 				this.scrollShouldEnd = false;

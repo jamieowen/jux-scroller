@@ -7,15 +7,15 @@ window.onload = function(){
 	var renderer = PIXI.autoDetectRenderer( 800, 600 );
 	document.body.appendChild( renderer.view );
 
-	var itemHeight = 100;
+	var itemHeight = 40;
 	// build elements.
-	var graphics = new PIXI.Graphics().beginFill(0xFFDE00,1).drawRect(0,0,400,itemHeight).endFill();
+	var graphics = new PIXI.Graphics().beginFill(0xFFDE00,0.4).drawRect(0,0,400,itemHeight).endFill();
 	var texture = graphics.generateTexture( renderer );
 
 	var stage = new PIXI.Container();
 	var container = new PIXI.Container();
 	var item;
-	var numItems = 30;
+	var numItems = 100;
 
 	for( var i = 0; i<numItems; i++ ){
 		item = new PIXI.Sprite( texture );
@@ -37,7 +37,6 @@ window.onload = function(){
 	var pointerMove = function(ev){
 		var pos = ev.data.getLocalPosition(this);
 		scroller.pointerMove( 0,pos.y );
-
 	};
 
 	stage.on( 'mousemove', pointerMove );
@@ -46,16 +45,20 @@ window.onload = function(){
 	stage.on( 'touchend', pointerUp );
 	stage.on( 'mousedown', pointerDown );
 	stage.on( 'touchstart', pointerDown );
+
 	stage.interactive = true;
 
 	// build scroller
 	var scroller = new Scroller( [false,true,false] );
+	scroller.axes[1].overshoot = 0.45;
 	scroller.setMin( 0,0 );
 	scroller.setMax( 0,( numItems * itemHeight ) + ( numItems-1 ));
 	scroller.setViewSize( 0,600 );
 
 	// snap to each item.
 	scroller.axes[1].constraints['snap'] = function( axis, pos ){
+		//return NaN;
+
 		if( Math.abs( axis.speed ) < 3 ){
 			// checking direction will cause the
 			// snap in the direction of movement
