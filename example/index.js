@@ -50,7 +50,7 @@ window.onload = function(){
 
 	// build scroller
 	var scroller = new Scroller( [false,true,false] );
-	scroller.axes[1].overshoot = 0.45;
+	scroller.axes[1].overshoot = 0.55;
 	scroller.setMin( 0,0 );
 	scroller.setMax( 0,( numItems * itemHeight ) + ( numItems-1 ));
 	scroller.setViewSize( 0,600 );

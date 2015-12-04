@@ -136,22 +136,18 @@ ScrollerAxis.prototype = {
 			if( !isNaN(overshot) ){
 				applyOvershoot = true;
 				moveAdjust = this.moveAmount - ( overshot - this.scrollStart );
-				console.log( 'adjust min', moveAdjust );
 			}else{
 				overshot = this.constraints['max'](this,pos);
 				if( !isNaN(overshot) ){
 					applyOvershoot = true;
 					moveAdjust = this.moveAmount - ( overshot - this.scrollStart );
-					console.log( 'adjust max', moveAdjust );
 				}
 			}
 
 			if( applyOvershoot ){
 				var max = this.overshoot * this.viewSize;
 				pos = overshot + ( moveAdjust / this.viewSize ) * max;
-				//console.log( 'apply overshoot', this.overshoot, this.viewSize, max, pos );
 			}
-
 
 			if( this.scrollShouldEnd ){
 				this.scrollShouldEnd = false;
