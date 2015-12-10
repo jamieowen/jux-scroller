@@ -55,23 +55,27 @@ window.onload = function(){
 	scroller.setMax( 0,( numItems * itemHeight ) + ( numItems-1 ));
 	scroller.setViewSize( 0,600 );
 
-	// snap to each item.
-	scroller.axes[1].constraints['snap'] = function( axis, pos ){
-		//return NaN;
+	var useSnap = false;
 
-		if( Math.abs( axis.speed ) < 3 ){
-			// checking direction will cause the
-			// snap in the direction of movement
-			if( axis.speed > 0 ){
-				return Math.ceil( pos / ( itemHeight+1 ) ) * ( itemHeight+1 );
+	if( useSnap ){
+		// snap to each item.
+		scroller.axes[1].constraints['snap'] = function( axis, pos ){
+			//return NaN;
+
+			if( Math.abs( axis.speed ) < 3 ){
+				// checking direction will cause the
+				// snap in the direction of movement
+				if( axis.speed > 0 ){
+					return Math.ceil( pos / ( itemHeight+1 ) ) * ( itemHeight+1 );
+				}else{
+					return Math.floor( pos / ( itemHeight+1 ) ) * ( itemHeight+1 );
+				}
+
 			}else{
-				return Math.floor( pos / ( itemHeight+1 ) ) * ( itemHeight+1 );
+				return NaN;
 			}
-
-		}else{
-			return NaN;
-		}
-	};
+		};
+	}
 
 	var update = function(){
 		scroller.update();

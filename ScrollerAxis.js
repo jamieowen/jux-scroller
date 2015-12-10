@@ -1,7 +1,6 @@
 
 var Pull = require( './ease/pull' );
 
-
 var ScrollerAxis = function(){
 
     this.position = 0;
@@ -48,16 +47,7 @@ var ScrollerAxis = function(){
 
 };
 
-var create = function(){
-    var axis = new ScrollerAxis();
-    return axis;
-};
-
-create.ScrollerAxis = ScrollerAxis;
-
-
-module.exports = ScrollerAxis; // leave as new() for now.
-
+module.exports = ScrollerAxis;
 
 ScrollerAxis.prototype = {
 
@@ -68,11 +58,10 @@ ScrollerAxis.prototype = {
     start: function(){
 
         if( !this.scrolling ){
-            this.scrollStart = this.position;
-            this.moveAmount = 0;
-            this.moveLast = 0;
+			this.reset();
+			this.resetActives();
             this.scrolling = true;
-			this.scrollShouldEnd = false;
+			this.scrollStart = this.position;
         }
     },
 
@@ -92,21 +81,27 @@ ScrollerAxis.prototype = {
         }
     },
 
-    /**wheelDelta: function( delta ){
-        if( !this.scrolling ){
-            var contentSize = ( this.max - this.min ) - this.viewSize;
-            var overshotMin = this.position > this.min;
-            var overshotMax = this.position < -contentSize;
+	reset: function( speed ){
+		// reset internals
+		this.speed = speed || 0;
+		this.scrollShouldEnd = false;
+		this.scrolling = false;
+		this.moveAmount = 0;
+		this.moveLast = 0;
+	},
 
-            if( !overshotMin && !overshotMax ){
+	resetActives: function(){
 
-                this.snapEase = null; // prevent
-                delta = -delta;
-                this.speed += delta * 0.03;
-            }
+		if( this.activeEase ){
+			this.activeEase.cancel();
+		}
 
-        }
-    },**/
+		this.activeEase = null;
+		this.activeConstraint = null;
+		this.positionTo = NaN;
+	},
+
+	// wheelDelta?
 
 	update: function(){
 
@@ -115,19 +110,7 @@ ScrollerAxis.prototype = {
 
 		if( this.scrolling || this.scrollShouldEnd ){
 
-			if( this.activeEase ){
-				this.activeEase.cancel();
-				this.activeEase = null;
-				this.activeConstraint = null;
-				this.positionTo = NaN;
-
-			}
-			this.speed = 0;
-
 			pos = this.scrollStart + this.moveAmount;
-
-			// adjust moveAmount = moveAmount - ( constraint - start )
-			// pos = constraint + ( adjustMoveAmount / viewSize ) * overShootMax;
 
 			var overshot = this.constraints['min'](this,pos);
 			var applyOvershoot = false;
@@ -150,11 +133,7 @@ ScrollerAxis.prototype = {
 			}
 
 			if( this.scrollShouldEnd ){
-				this.scrollShouldEnd = false;
-				this.scrolling = false;
-				this.speed += this.moveLast;
-				this.moveAmount = 0;
-				this.moveLast = 0;
+				this.reset( this.moveLast ); // reset and set speed to last move amount
 			}
 		}
 
@@ -187,12 +166,11 @@ ScrollerAxis.prototype = {
 		if( this.activeEase ){
 			pos = this.activeEase.update();
 			if( this.activeEase.done ){
-				this.activeEase = null;
-				this.activeConstraint = null;
+				this.resetActives();
 				this.speed = 0;
-				this.positionTo = NaN;
 			}
-		}else{
+		}else
+		if( !wasScrolling ){
 			this.speed *= this.friction;
 			if( Math.abs(this.speed) < 0.001 ){
 				this.speed = 0;
