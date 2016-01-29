@@ -1,6 +1,6 @@
 {
   "name": "jux-scroller",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Scroller class.. wip",
   "main": "index.js",
   "scripts": {
